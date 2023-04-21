@@ -1,0 +1,18 @@
+<html>
+<head>
+  <script src="stablediffusion-api.js"></script>
+  <script>
+    window.onload = function() {
+      document.getElementById("btn").addEventListener('click',function() {
+          getStableDiffusion(document.getElementById('description').value, document.getElementById('img'))
+
+     })
+    }
+  </script>
+</head>
+<body>
+<textarea id="description"></textarea>
+<button id="btn">Click to redo image</button>
+<img id="img" src="" style="width:400px;"></img>
+</body>
+</html>
