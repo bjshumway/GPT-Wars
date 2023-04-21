@@ -68,7 +68,7 @@ function trimArrOfStr(arr) {
   return arr;
 }
 
-function gptOptionsToArray(str, numResultsExpected,skipStartTextCruft) {
+function gptOptionsToArray(str, numResultsExpected) {
 
 
   //GPT's pattern for giving options seems to be to separate the options by newline
@@ -76,7 +76,6 @@ function gptOptionsToArray(str, numResultsExpected,skipStartTextCruft) {
   //If I specified it to give me "A" or "B" the separator type would be ( A., B.) (A:, B:)
   //TODO: implement error handling, where if the expected numbered of results is incorrect, we re-run the GPT function
   //      this would have to be an argument we can pass into GPT, e.g. rltType 'string' or 'array'
-  ///skipStartTextCruft is used for GPT responses that sometimes retun cruft before it divulges the list
   
 
   /*
@@ -377,7 +376,7 @@ function makeGPTInternal(prompt, maxTok, tempr = 0.7, frequenceyPenalty = 0.0,su
       }
       
       xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('Authorization', 'Bearer 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');
+      xhr.setRequestHeader('Authorization', 'Bearer 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');
 
       xhr.responseType = 'json';
       console.log(data)

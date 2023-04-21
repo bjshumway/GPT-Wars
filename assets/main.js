@@ -174,6 +174,19 @@ window.addEventListener('load', function() {
   if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)) {
     isMobile = true;
   }
+
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const params = Object.fromEntries(urlSearchParams.entries());
+
+  if(params.activationHash) {
+    //Check if the user is activated already... if not popup the "create account" div
+    getActivationStatus(activationHash).then(function(rslt) {
+      if(rslt.notYetActivated) {
+        //Show the 'Create Account' div
+        
+      }
+    });
+  }  
   
 
   $('html').on('click',function() {

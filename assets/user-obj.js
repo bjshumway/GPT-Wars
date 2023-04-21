@@ -211,3 +211,43 @@ function getOpponentsFromCloud(avoidCharacterUUID) {
 
 });
 }
+
+function getActivationStatus(activationHash) {
+  return new Promise(function (resolve, reject) {
+
+      const xhr = new XMLHttpRequest();
+        xhr.open('GET',
+            'https://g8of6q1nn0.execute-api.us-east-1.amazonaws.com/staging/user?checkActivationHash=' + activationHash);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //xhr.setRequestHeader('x-cors-api-key', 'live_f144e8a3a8e52eb9bb0b4a6a302356af186f99b873a1816b17d4c84f548ad5af')
+
+        xhr.responseType = 'json';
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('userObj', xhr.response)
+                resolve(xhr.response);
+            } else {
+                console.log(xhr.statusText);
+                reject({
+                status: xhr.status,
+                statusText: xhr.statusText
+            });
+            }
+        };
+
+        xhr.onerror = function () {
+            console.log(xhr.statusText)
+            reject({
+                status: xhr.status,
+                statusText: xhr.statusText
+            });
+        };
+
+
+        xhr.send();
+
+  });
+}
+
+
