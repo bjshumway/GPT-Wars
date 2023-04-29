@@ -212,12 +212,12 @@ function getOpponentsFromCloud(avoidCharacterUUID) {
 });
 }
 
-function getActivationStatus(activationHash) {
+function getActivationStatus(activationHash,userId) {
   return new Promise(function (resolve, reject) {
 
       const xhr = new XMLHttpRequest();
         xhr.open('GET',
-            'https://g8of6q1nn0.execute-api.us-east-1.amazonaws.com/staging/user?checkActivationHash=' + activationHash);
+            'https://g8of6q1nn0.execute-api.us-east-1.amazonaws.com/staging/user?checkActivationHash=' + activationHash + '&userId=' + userId);
         xhr.setRequestHeader('Content-Type', 'application/json');
         //xhr.setRequestHeader('x-cors-api-key', 'live_f144e8a3a8e52eb9bb0b4a6a302356af186f99b873a1816b17d4c84f548ad5af')
 
@@ -246,6 +246,82 @@ function getActivationStatus(activationHash) {
 
 
         xhr.send();
+
+  });
+}
+
+function loginNormalAccount(userName,password) {
+  return new Promise(function (resolve, reject) {
+
+    const xhr = new XMLHttpRequest();
+      xhr.open('POST',
+          'https://g8of6q1nn0.execute-api.us-east-1.amazonaws.com/staging/user?loginNormalAccount=Y');
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      //xhr.setRequestHeader('x-cors-api-key', 'live_f144e8a3a8e52eb9bb0b4a6a302356af186f99b873a1816b17d4c84f548ad5af')
+
+      xhr.responseType = 'json';
+
+      xhr.onload = function() {
+          if (xhr.status >= 200 && xhr.status < 300) {
+              console.log('userObj', xhr.response)
+              resolve(xhr.response);
+          } else {
+              console.log(xhr.statusText);
+              reject({
+              status: xhr.status,
+              statusText: xhr.statusText
+          });
+          }
+      };
+
+      xhr.onerror = function () {
+          console.log(xhr.statusText)
+          reject({
+              status: xhr.status,
+              statusText: xhr.statusText
+          });
+      };
+
+      //Important TODO: Hash the password with a 256 SHA
+      xhr.send(JSON.stringify({userName: userName, password: password}));
+  });  
+}
+
+function registerNormalAccount(userName,password) {
+  return new Promise(function (resolve, reject) {
+
+      const xhr = new XMLHttpRequest();
+        xhr.open('POST',
+            'https://g8of6q1nn0.execute-api.us-east-1.amazonaws.com/staging/user?registerNormalAccount=Y');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        //xhr.setRequestHeader('x-cors-api-key', 'live_f144e8a3a8e52eb9bb0b4a6a302356af186f99b873a1816b17d4c84f548ad5af')
+
+        xhr.responseType = 'json';
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                console.log('userObj', xhr.response)
+                resolve(xhr.response);
+            } else {
+                console.log(xhr.statusText);
+                reject({
+                status: xhr.status,
+                statusText: xhr.statusText
+            });
+            }
+        };
+
+        xhr.onerror = function () {
+            console.log(xhr.statusText)
+            reject({
+                status: xhr.status,
+                statusText: xhr.statusText
+            });
+        };
+
+        userObj.userName = userName;
+        userObj.password = password; //Important TODO: Hash it with a 256 SHA
+        xhr.send(JSON.stringify(userObj));
 
   });
 }

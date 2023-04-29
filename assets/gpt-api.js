@@ -488,7 +488,8 @@ That contains three unique attributes for the character (strings). Three unique 
     300,
     1,
     0.00,
-    undefined)
+    undefined,
+    4)
 
   try {
     opts = JSON.parse(opts.trim());
@@ -746,7 +747,7 @@ window.handlePostStoryXHR = async function(data,finishedFor,index) {
 //Creative Writing Instructions: Based on the characters and story below, write several thrilling paragraphs on the epic showdown between ${storyLogic.char1} and ${storyLogic.char2}.
     makeGPT(
 `#Award Wining Fan Fiction
-Creative Writing Instructions: Based on the characters and story below, write several paragraphs about ${storyLogic.char1} and ${storyLogic.char2}.
+Creative Writing Instructions: Based on the characters and story below, complete the showdown in which ${storyLogic.char1} defeats ${storyLogic.char2}.
 ---
 ${bothCharactersTopOfPrompt}
 
@@ -756,7 +757,7 @@ ${storyLogic.chunks[1].text}
 
 ${storyLogic.chunks[2].text}
 ---
-Creative Writing Instructions: Based on the characters and story above, write several paragraphs on the showdown in which ${storyLogic.char1} is ultimately the victor!
+Creative Writing Instructions: Based on the characters and story above, complete the showdown in which ${storyLogic.char1} defeates ${storyLogic.char2}!
 `, undefined,1,0.00, //Harvard Writing Exam: In 500 words (several paragaraphs), finish the story above.
 undefined, 
 4
@@ -1027,13 +1028,13 @@ async function writeStory(opponent, opponentDescription, isIntroStory,opponentRa
       
       if(isIntroStory) {
         switch(storyLogic.opponent) {
-          case 'Merlin': storyLogic.opponentDescription = "Merlin: Merlin is an icon of strength and wisdom, with many around King Arthur's court depending on his guidance. He is robed in purple and gold, with a crown of emerald on his head. He wields a staff carved of wood and gold, that crackles with energy from powerful spells. His voice is deep and powerful, and his words touch the soul of all who hear him. His mastery of the mystical arts of alchemy and divination are renowned and his counsel is sought after by noblemen alike, for his wisdom and insight cut through the darkness like a ray of light.";
+          case 'Merlin': storyLogic.opponentDescription = "Merlin is a revered sage in King Arthur's court, known for his mastery of alchemy and divination. He is cloaked in regal robes of purple and gold, with a crown of emerald upon his head, which symbolizes his deep connection to the mystical forces of the universe. His voice is deep and resonant, and his words have the power to touch the soul of all who hear him. However, Merlin is consumed by a singular obsession: the acquisition of knowledge of a spell that he believes could transform mundane objects into cheese wheels. Yes, you read that right - cheese wheels. He spends his days poring over ancient tomes and experimenting with alchemical formulas, always seeking to unlock the secrets of this elusive spell. His quest for knowledge sometimes causes him to take risks that others might find foolish, but he is undeterred in his pursuit of this goal. Even as the realm faces growing threats from all sides, Merlin remains focused on his mission, convinced that the ability to transform anything into delicious cheese is a magic worth mastering.";
                          storyLogic.opponentRating = 1600;
                 break;
-          case 'Staria Stormrider': storyLogic.opponentDescription = "Staria Stormrider: Staria Stormrider is a professional bounty hunter in an advanced, post-apocalyptic society. Her striking appearance reflects her formidable presence. Her fiery red hair hangs to her waist and frames a commanding face of intimidating steel blue eyes. She wears fiery leather battle armor that is tough enough to withstand the rigors of her occupation. Her weapon of choice is a custom-designed single-handed plasma rifle, powerful enough to knock down a giant robot. Staria's creative techniques befuddle her team members who accuse her of going rogue. She manages to complete high paying jobs while still championing the needy."
+          case 'Staria Stormrider': storyLogic.opponentDescription = "Staria Stormrider: a former elite soldier turned bounty hunter in a post-apocalyptic world, is driven by her ambition to obtain the legendary \"Worldbreaker\" weapon. This elusive artifact, believed to harness the energy of collapsing stars, has the potential to level entire cities or even alter the planet's climate. With her cropped red hair, icy blue eyes, and scars from numerous battles, Storm strikes fear into her opponents. Obsessed with the Worldbreaker's unimaginable power, she infiltrated and betrayed a group of freedom fighters who were fighting against Warlod Khan's rule, solely for the purpose of learning the weapon's whereabouts. Her ambition must be stopped."
                          storyLogic.opponentRating = 1500;
                break;
-          case 'Agent Steele': storyLogic.opponentDescription = "Agent Steele is a young and troubled detective. His father is a ring leader of the criminal syndicate \"Tantulus\" known for corrputing politicians to siphon money away from government. Agent Steele is tall, lean and strong, with tanned skin, sharp cheekbones and an angular jaw. His quick wit, vast knowledge and skills as a detective have made him feared and respected - even by his father. Agent Steele may be young and troubled, but he has the skills required to solve any case—no matter the degree of difficulty."
+          case 'Agent Steele': storyLogic.opponentDescription = "Agent Jasper Steele: a cunning and tormented detective in his late twenties, expertly balances on the razor's edge between law enforcement and the criminal underworld. Born into the powerful syndicate \"Tantalus\" and trained by his ruthless father, the notorious ringleader, Steele has been molded into a master manipulator, skilled in deception and sabotage. Tall and muscular, with piercing blue eyes and sharp features, Steele's outward appearance mirrors his sinister nature. As the organization's mole, he relentlessly protects Tantalus' interests by undermining investigations and masking their illicit activities."
                          storyLogic.opponentRating = 1400;
                  break;
         }
@@ -1134,9 +1135,9 @@ Between the two characters described above, which would win if they went up agai
                                 '\n---\n';
 
       storyLogic.backStory = (await makeGPT(
-        'Creative Writing Prompt: Based on the character descriptions below, come up with a thematic backstory to explain the upcoming battle between ' + storyLogic.char1 +' and ' + storyLogic.char2 + '\n\n' +
+        'Creative Writing Prompt: Based on the character descriptions below, come up with a riveting/thematic backstory for the upcoming showdown between ' + storyLogic.char1 +' versus ' + storyLogic.char2 + '\n\n' +
         bothCharactersTopOfPromptWithoutPowers +
-        'Based on the character descriptions above, come up with a backstory to explain the upcoming battle between ' + storyLogic.char1 +' and ' + storyLogic.char2 +'. (Only one paragraph in length)',
+        'Creative Writing Prompt: Based on the character descriptions above, come up with a riveting/thematic backstory for the upcoming showdown between ' + storyLogic.char1 +' versus ' + storyLogic.char2 +' (explaining why the two characters are add odds with each other) (Only one paragraph in length)',
         undefined,
         1,
         0.00,
@@ -1186,7 +1187,7 @@ Between the two characters described above, which would win if they went up agai
 storyLogic.chunks[0].text = 
 (await makeGPT(
 `#Award Wining Fan Fiction
-Write an epic fan fiction depicting the battle between ${storyLogic.char1} and ${storyLogic.char2}
+Write an epic fan fiction depicting the showdown between ${storyLogic.char1} and ${storyLogic.char2}
 ---
 ${bothCharactersTopOfPrompt}
 
@@ -1208,7 +1209,7 @@ incrementLoadingBar();
 //Write Page 3 "The quoting"
 makeGPT(
 `#Award Wining Fan Fiction
-Below is an epic fan fiction depicting the battle between ${storyLogic.char1} and ${storyLogic.char2}
+Below is an epic fan fiction depicting the showdown between ${storyLogic.char1} and ${storyLogic.char2}
 ---
 ${bothCharactersTopOfPromptWithoutPowers}
 

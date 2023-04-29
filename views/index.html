@@ -64,17 +64,41 @@
 <!-- Login -->
 <div id="login-div">
   <p class="input-field">Username</p>
-    <input type="text">
-  <p class="input-field">Password</p>
-    <input type="password">
-  <p style="text-align: center;">
+    <input type="text" id="login-username">
+  <p class="input-field" >Password</p>
+    <input type="password" id="login-password">
+    <p style="text-align: center;">
+      <button id="login-button">Login</button>
+    </p>  
+    <p style="text-align: center;">
     <a href="#" class="link">Forgot Password</a>
   </p>
   <p style="text-align: center;">
-    <a href="#" class="link">Register</a>
+    <a href="http://www.aiforge.io/subscribe" class="link">Register</a>
   </p>
   <div id="google-container">
     <div id="buttonDiv" style="display: inline-block;"></div>
+  </div> 
+</div>
+
+<!-- Create Account -->
+<div id="create-account">
+  <p><center>Welcome to GPT-Wars!</center></p>
+  <p><center>Create an account to get started</center></p>
+
+  <p class="input-field">Username</p>
+    <input type="text" id="register-username">
+  <p class="input-field">Password</p>
+    <input type="password" id="register-password-1">
+  <p class="input-field">Re-type Password</p>
+    <input type="password" id="register-password-2">
+    <p style="text-align: center;">
+      <button id="register-button">Register</button>
+    </p>
+    <div class="google-container">
+    - Or register via google -
+    <br />
+    <div id="buttonDiv2" style="display: inline-block;"></div>
   </div> 
 </div>
 

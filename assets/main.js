@@ -18,7 +18,8 @@ var userObj = {
 
 
 loadingUser = false;
-
+currentlyRegistering = false;
+windowLocationWithoutArguments = location.protocol + '//' + location.host + location.pathname;
 
 // Creates an AudioContext and AudioContextBuffer
 var audioContext;
@@ -167,9 +168,6 @@ audioContext = new AudioContext();
 
 window.addEventListener('load', function() {
 
-  console.log("Hello World. This is running!");
-  alert("You must click the okay button!");
-
   var ua = navigator.userAgent;
   if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)) {
     isMobile = true;
@@ -178,15 +176,48 @@ window.addEventListener('load', function() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   const params = Object.fromEntries(urlSearchParams.entries());
 
-  if(params.activationHash) {
-    //Check if the user is activated already... if not popup the "create account" div
-    getActivationStatus(activationHash).then(function(rslt) {
-      if(rslt.notYetActivated) {
-        //Show the 'Create Account' div
+  if(params.activationHash && !sessionStorage["userId"]) {
+    //Check if the user is activated already... if not popup the #create-account div
+    getActivationStatus(params.activationHash,params.userId).then(function(rslt) {
+      if(rslt.userId) {
+        currentlyRegistering = true;
+
+        //Set the user to the user obj
+        userObj = rslt;
+
+        //Show the "register account" div
+        $("#create-account").show();
+        $("#start-button").hide();
+        $('.loading-container').hide();
+        $("#login").hide();
         
+
+        $('#register-button').on("click",function() {
+          var pw1 = $('#register-password-1').val().trim();
+          var pw2 = $('#register-password-2').val().trim();
+          var userName = $('#register-username').val().trim();
+
+          if(pw1 != pw2) {
+            alert("Passwords do not match");
+          } else if (!userName) {
+            alert("Please enter a username")
+          } else if (pw1.length < 8) {
+            alert("Password must be at least 8 characters");
+          }else {
+            registerNormalAccount(userName, pw1,userObj.userId,userObj.activationHash).then(function(rslt) {
+              if(rslt && rslt.accountActivation == "activated") {
+                //TODO: Flash an "Account Created!" for two seconds
+                sessionStorage["userId"] = userObj.userId;
+                window.location.href = windowLocationWithoutArguments;
+              }
+            })
+          }
+        });
+
       }
     });
   }  
+  
   
 
   $('html').on('click',function() {
@@ -213,9 +244,44 @@ window.addEventListener('load', function() {
     return false;
   })
 
+  $('#login-button').on('click',function() {
+    $('.loading-container').show();
+    var login = $("#login-username").val().trim();
+    var pw    = $('#login-password').val().trim();
+
+    if(!login) {
+      alert("Please enter username");
+      $('.loading-container').hide();
+      return false;
+    }
+    if(!pw) {
+      alert("Please enter password");
+      $('.loading-container').hide();
+      return false;
+    }
+    if(pw.length < 8) {
+      alert("Invalid username/password");
+      $('.loading-container').hide();
+      return false;
+    }
+    
+    loginNormalAccount(login,pw).then(function(rslt) {
+      $('.loading-container').hide();
+      if(rslt.userId) {
+        sessionStorage["userId"] = rslt.userId;
+        alert("Login Successful");
+        window.location.href = windowLocationWithoutArguments;
+      } else {
+        //TOOD: replace alerts with a more friendly looking UI component
+        alert("Invalid username/password");
+      } 
+    });
+    return false;
+  });
+
   $('#logout').on('click', function() {
     sessionStorage.clear();
-    window.location.reload();
+    window.location.href = windowLocationWithoutArguments;
     return false;
   })
 
@@ -227,7 +293,7 @@ window.addEventListener('load', function() {
     if(!sessionStorage["userId"]) {
 
       //Don't show it if we are in the middle of loading the user...
-      if(!loadingUser) {
+      if(!loadingUser || currentlyRegistering) {
         $('#start-button').show();
       }
     }
@@ -330,6 +396,11 @@ window.addEventListener('load', function() {
       document.getElementById("buttonDiv"),
       { theme: "outline", size: "large" }  // customization attributes
     );
+
+  google.accounts.id.renderButton(
+    document.getElementById("buttonDiv2"),
+    { theme: "outline", size: "large" }  // customization attributes
+  );
 
     $('#voice-audio-on-off').on('change',function() {
       if($(this).prop('checked')) {

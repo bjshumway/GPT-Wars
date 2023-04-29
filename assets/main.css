@@ -48,7 +48,7 @@ body {
 }
 
 a {
-  color: revert !important;
+  color: revert;
 }
 
 @media (pointer:coarse) {
@@ -159,7 +159,7 @@ body::-webkit-scrollbar{
   top:0;
   width:100%;
   height:98vh;
-  z-index:1000;
+  z-index:9999999999999999;
   animation-name: loadlogo;
   animation-duration: 2.0s;
 }
@@ -182,6 +182,20 @@ body::-webkit-scrollbar{
 }
 
 #login-div {
+  z-index: 999999;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  background-color: darkslategray;
+  padding: 2%;
+  border-radius: 5%;
+  box-shadow: .25vw .25vw .25vw .25vw black;
+  color: antiquewhite;
+  display:none;
+}
+
+#create-account {
   z-index: 999999;
   position: absolute;
   top: 25%;
@@ -281,22 +295,19 @@ body::-webkit-scrollbar{
 
 #login-div .input-field {
   margin-bottom: 0;  
-  display:none;
 }
 
 #login-div input {
   width:100%;
-  display:none;
 }
 
 
 
 #login-div .link {
   color: aqua;
-  display:none;
 }
 
-#google-container {
+.google-container {
   text-align:center; 
   width: 100%; 
   padding-top: 5%;
