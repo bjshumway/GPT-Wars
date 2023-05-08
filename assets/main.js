@@ -1,4 +1,4 @@
-var userObj = {
+var defaultUserObj = {
   justCompletedFirstBattle: false,
   finishedIntro: false, 
   characters: {}, //Characters is huge. contains the characters, and their associated stories
@@ -6,6 +6,7 @@ var userObj = {
   voiceVolume: 100,
   voiceSpeed: 1.2,
   developerMode: true,
+  voiceAudioOn: false, //Off by default until the service becomes cheaper
 
   userId: 'U' + Math.floor(Math.random() * 10000000000000), //If we haven't logged in, we get a random ID to track our "session" (even though its not in sessionStorage),
                                                             //   so we can play the first game without logging in...
@@ -13,17 +14,50 @@ var userObj = {
   userRating: undefined,
   credentialsType: undefined,
   createdAccountOn: undefined,
-  headshotImageUrl: undefined
+  headshotImageUrl: undefined,
+  creditsRemaining: 25 //Each game is worth one credit
 }
 
+//Deep copy 
+//Source" https://www.javascripttutorial.net/object/3-ways-to-copy-objects-in-javascript/
+var userObj = JSON.parse(JSON.stringify(defaultUserObj));
 
-loadingUser = false;
-currentlyRegistering = false;
-windowLocationWithoutArguments = location.protocol + '//' + location.host + location.pathname;
+
+var loadingUser = false;
+var currentlyRegistering = false;
+var windowLocationWithoutArguments = location.protocol + '//' + location.host + location.pathname;
+var showingSplashLogo = true;
+
+var introVoiceAudio = false;
+
 
 // Creates an AudioContext and AudioContextBuffer
 var audioContext;
 var audios = {} //Used for the different audios in the game
+
+// Book Logic
+var book = {
+  currentLocation: 0,
+  numOfPapers: null,
+  maxLocation: null
+}
+
+var storyLogic = {
+  currentCharacter: '',
+  storyFinished: false,
+  showLoadingTextForQAC: null,
+  runThroughLoadingImages: false,
+  rawStoryText: null,
+  imageURLs: [],
+  soundURLs: [],
+  storyParts: ['','','',''],
+  imageParts: ['','','','']
+}
+
+var appLocation;
+var currentLoadImage = 0;
+var isMobile = false;
+
 
 async function loadAudio(audioName,url, playImmediately) {
   var request = new XMLHttpRequest();
@@ -70,7 +104,11 @@ function playAudio(audioName,delay,cb) {
         source.connect(gainNode);
         // Connect the gain node to the destination.
         gainNode.connect(audioContext.destination);
-        gainNode.gain.value = 0.03; //probably should be .03?
+        if(introVoiceAudio) {
+          gainNode.gain.value = 0.03; //Dim it so you can hear the guy talking          
+        }else {
+          gainNode.gain.value = 0.6; //The song is a litle bit loud          
+        }
 
       } else {
         source.connect(audioContext.destination);       // connect the source to the context's destination (the speakers)
@@ -101,35 +139,6 @@ async function stopAudio(audioName) {
     audios[audioName].playASAP = false;
   }
 }
-
-
-
-
-// Book Logic
-var book = {
-  currentLocation: 0,
-  numOfPapers: null,
-  maxLocation: null
-}
-
-
-
-var storyLogic = {
-  currentCharacter: '',
-  storyFinished: false,
-  showLoadingTextForQAC: null,
-  runThroughLoadingImages: false,
-  rawStoryText: null,
-  imageURLs: [],
-  soundURLs: [],
-  storyParts: ['','','',''],
-  imageParts: ['','','','']
-}
-
-var appLocation;
-var currentLoadImage = 0;
-
-var isMobile = false;
 
 
 function openAccordian(id) {
@@ -185,6 +194,9 @@ window.addEventListener('load', function() {
         //Set the user to the user obj
         userObj = rslt;
 
+        //Off for now until voice audio becomes cheaper
+        userObj.voiceAudioOn = false;
+
         //Show the "register account" div
         $("#create-account").show();
         $("#start-button").hide();
@@ -235,6 +247,11 @@ window.addEventListener('load', function() {
     $('#show-reason-outcome').hide();
     $('#choose-your-character').hide();
     $('#replace-existing-powerup').hide();
+
+    //Hide the "Welcome" popup
+    if(!showingSplashLogo) {
+      $('#thank-you-for-your-interest').hide();
+    }
   })
   
 
@@ -304,15 +321,23 @@ window.addEventListener('load', function() {
     loadingUser = true;
     getUserObj(sessionStorage["userId"]).then(function(data) {
       userObj = data;
+      //Off for now until the audio api's get cheaper
+      userObj.voiceAudioOn = false;
       loadingUser = false;
       if(userObj.finishedIntro) {
         $('#start-button').hide();
         $('#battle').show();
+        $('#store').show();
+        $('#front-page-coin').show();
+        $('#front-page-coin-img').show();    
         $('#characters').show();
         $('#settings').show();    
       } else {
         $('#start-button').show();
         $('#battle').hide();
+        $('#store').hide();
+        $('#front-page-coin').hide();
+        $('#front-page-coin-img').hide();    
         $('#characters').hide();
         $('#settings').hide();    
       }
@@ -327,6 +352,9 @@ window.addEventListener('load', function() {
     $('#login').show();
     $('#logout').hide();
     $('#battle').hide();
+    $('#store').hide();
+    $('#front-page-coin').hide();
+    $('#front-page-coin-img').hide();
     $('#characters').hide();
     $('#settings').hide();
   }
@@ -366,6 +394,7 @@ window.addEventListener('load', function() {
          //We are still loading the userId... its taking more time than expected
          $('.loading-container').show();
        }
+       showingSplashLogo = false;
     },5000)
 
     $('#description-architype').on('keyup',function() {
@@ -524,18 +553,27 @@ function handleClicks(e) {
   if(appLocation == 'intro') {
     //Handle intro sounds
     if (id =="go-to-intro2") {
-      audioVoiceSounded = playAudio('introduction2-voice',500,disableTheButton);
-      disableButton = 'go-to-intro-tournament';
-    }else if (id == "go-to-intro-tournament") {
-      audioVoiceSounded = playAudio('architype-voice',500,disableTheButton);
+      if(introVoiceAudio) {
+        audioVoiceSounded = playAudio('introduction2-voice',500,disableTheButton);        
+      }
       disableButton = 'go-to-architype-intro';
-    }else if(id == "go-to-architype-intro") {
+    }/*else if (id == "go-to-intro-tournament") {
+      if(introVoiceAudio) {
+        audioVoiceSounded = playAudio('architype-voice',500,disableTheButton);
+      }
+      disableButton = 'go-to-architype-intro';
+    }*/
+    else if(id == "go-to-architype-intro") {
 
     }else if(id =="go-to-name-creation") {
-      audioVoiceSounded = playAudio('name-voice',500,disableTheButton);
+      if(introVoiceAudio) {
+        audioVoiceSounded = playAudio('name-voice',500,disableTheButton);
+      }
       disableButton = 'generate-description';
     }else if(id =="generate-description") {
-      audioVoiceSounded = playAudio('desc-intro',500,disableTheButton);      
+      if(introVoiceAudio) {
+        audioVoiceSounded = playAudio('desc-intro',500,disableTheButton);
+      }
       disableButton = 'continue-to-writing-the-description';
     }else if (id=="go-to-description-comment") {
 
@@ -625,7 +663,9 @@ function handleClicks(e) {
         $('.replace-powerup').on('click', function() {
           userObj.characters[storyLogic.currentCharacter].powerups.splice(1,$(this).data('powerupidx'),storyLogic.chosenPowerup);
           $('#replace-existing-powerup').hide();
-          $('#back-page-btn').show();
+          if(!isMobile) {        
+            $('#back-page-btn').show();
+          }
           goSpecificPage(0);
           alert("Character Updated!");
           saveUser();
@@ -696,7 +736,9 @@ function handleClicks(e) {
     goNextPage()      
   }
   if(book.currentLocation > 0 ){
-    $('#back-page-btn').show();
+    if(!isMobile) {
+      $('#back-page-btn').show();
+    }
   } else {
     $('#back-page-btn').hide();        
   }
@@ -766,7 +808,15 @@ async function playStory(part) {
   }
 
   var theChunkText = storyLogic.chunks[part-1].text;
-  var chunks = theChunkText.match(/[^\.!\?]+[\.\!\?]"?\s*/g);
+  var chunks;
+  if(userObj.voiceAudioOn) {
+    //Go at approximately the speed of the audio... one sentence at a time.
+    chunks = theChunkText.match(/[^\.!\?]+[\.\!\?]"?\s*/g);
+  } else {
+    //Break down words at a time....
+    chunks = theChunkText.match(/[^\s]+\s?/g);
+  }
+
   
   var timing = 0;
 
@@ -788,15 +838,23 @@ async function playStory(part) {
     }
 
 
-    timing += (chunks[i].length * 0.05774278215) * 1000;
-    
+    var readingSpeed;
     if(userObj.voiceAudioOn) {
-      timing *= 1.00 //paragraphs show up slightly faster than average speech
+      readingSpeed = 1.00 //paragraphs show up slightly faster than average speech
                      //TODO Add a "reading speed" option in the settings
     } else {
-      timing *= .4; //The user can be a relatively fast reader, so the paragraphs show up faster here
+      readingSpeed = .9; //The user can be a relatively fast reader, so the paragraphs show up faster here
                    //TODO: refactor this code so that the story comes out word by word
+      if(chunks[i].indexOf(",") != -1 ||
+        chunks[i].indexOf(".") != -1 || 
+        chunks[i].indexOf(";") != -1) {
+          readingSpeed = 1.2; //Really slow down at the end of sentences and at commas
+        }
     }
+
+    timing += (chunks[i].length * 0.05774278215 * readingSpeed) * 1000;
+    
+
     console.log('paragraph timing', timing);
 
     chunks[i] = '<span id="story-paragraph-' + part + '-' + i + '" style="display:none;">' + chunks[i] + '</span>';

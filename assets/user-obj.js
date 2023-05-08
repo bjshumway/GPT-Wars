@@ -20,6 +20,12 @@ function getUserObj(userId) {
       xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
               console.log('userObj', xhr.response)
+              for(i in defaultUserObj) {
+              if(!userObj[i]) {
+                    //Any newly added defaults not stored in the server get applied here
+                    xhr.response[i] = defaultUserObj[i];
+                }
+              }
               resolve(xhr.response);
           } else {
               console.log(xhr.statusText);
@@ -264,6 +270,12 @@ function loginNormalAccount(userName,password) {
       xhr.onload = function() {
           if (xhr.status >= 200 && xhr.status < 300) {
               console.log('userObj', xhr.response)
+              for(i in defaultUserObj) {
+                if(!userObj[i]) {
+                    //Any newly added defaults not stored in the server get applied here
+                    xhr.response[i] = defaultUserObj[i];
+                }
+              }      
               resolve(xhr.response);
           } else {
               console.log(xhr.statusText);

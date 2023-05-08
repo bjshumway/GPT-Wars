@@ -95,7 +95,9 @@ window.addEventListener('load', function() {
     $('#char-book').show();
     $('#char-read-view').show();
 
-    $('#back-page-btn').show();
+    if(!isMobile) {
+      $('#back-page-btn').show();
+    }
     $('.next-char').show();
     $('.prev-char').hide();
     charBook.currentIndex = 0;

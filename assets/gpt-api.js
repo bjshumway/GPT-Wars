@@ -350,6 +350,13 @@ function makeGPTInternal(prompt, maxTok, tempr = 0.7, frequenceyPenalty = 0.0,su
         presence_penalty: 0
     };
 
+      //Hard-code set to turbo until they come out with GPT 4 Turbo....
+      //Too expensive
+      if(!suffix /*most cases*/) {
+        model = 3.5 
+      } else{
+        model = 3;
+      }
 
       if(model ==3) {
         url = 'https://api.openai.com/v1/completions';
@@ -360,9 +367,9 @@ function makeGPTInternal(prompt, maxTok, tempr = 0.7, frequenceyPenalty = 0.0,su
         data["model"] = model
         var numPromptTok = mod.encode(prompt + suffix).length;
         data["max_tokens"] = (maxTok ? maxTok : 4096) - numPromptTok;
-      }else {
+      }else if(model == 3.5 || model == 4) {
         url = 'https://api.openai.com/v1/chat/completions';
-        model = 'gpt-4'
+        model = 'gpt-3.5-turbo'; //'gpt-4' // 4 is just too expensive
         xhr.open('POST', url);
         data["messages"] =  [{
             "role":"user",
@@ -376,7 +383,7 @@ function makeGPTInternal(prompt, maxTok, tempr = 0.7, frequenceyPenalty = 0.0,su
       }
       
       xhr.setRequestHeader('Content-Type', 'application/json');
-      xhr.setRequestHeader('Authorization', 'Bearer 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');
+      xhr.setRequestHeader('Authorization', 'Bearer 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');
 
       xhr.responseType = 'json';
       console.log(data)
@@ -479,12 +486,11 @@ ${comment}
 Given the character architype above, write a JSON object in the form of
 {
   "architype": "${architype.replaceAll('"','')}",
-  "attribute": [...],
-  "skill": [...],
-  "useful_resource": [...]
+  "thematic_skills": [...],
+  "useful_resources": [...]
 }
 
-That contains three unique attributes for the character (strings). Three unique skills (string). And three unique useful resources (strings).`,
+That contains three awesome skills that are thematic to the character (string). And three useful resources for the character(strings).`,
     300,
     1,
     0.00,
@@ -493,15 +499,13 @@ That contains three unique attributes for the character (strings). Three unique 
 
   try {
     opts = JSON.parse(opts.trim());
-    var selects = ['#char-attribute','#char-skill','#char-resource']
+    var selects = ['#char-skill','#char-resource']
     for(el in selects) {
       var jsonAttribute;
-      if(selects[el] == '#char-attribute') {
-        jsonAttribute = 'attribute'
-      } else if(selects[el] == '#char-skill') {
-        jsonAttribute = 'skill'
+      if(selects[el] == '#char-skill') {
+        jsonAttribute = 'thematic_skills'
       }else {
-        jsonAttribute = 'useful_resource'
+        jsonAttribute = 'useful_resources'
       }
       $(selects[el]).html(
 `
@@ -518,7 +522,7 @@ That contains three unique attributes for the character (strings). Three unique 
   } catch(e) {
     //Oh well we tried. console.log it to understand what happened
     $('.char-desc-choice').val("");
-    console.log(e, "Err retrieving skills/attributes/resources", opts);
+    console.log(e, "Err retrieving attributes/resources", opts);
     $('.char-desc-choice').hide();    
   }
 
@@ -539,7 +543,8 @@ async function suggestName(characterArchetype) {
   console.log(name);
   name = name.trim();
   if(name.split('\n').length > 1) {
-    name = name.split('\n')[0];
+    //Take the second line... as the first line can sometimes be "Here are some names for blah blah blah"
+    name = name.split('\n')[1];
     //Get rid of 1. 2. 3.
     name = name.replace(/^[1,a][,\.]/,'')
   }
@@ -562,9 +567,6 @@ async function suggestDescription(characterArchetype) {
       var traitsStr = "";
       if($('#char-gender').val()) {
         traitsStr = "Gender: " + $('#char-gender').val() + "\n";
-      }
-      if($('#char-attribute').val()) {
-        traitsStr += "Attribute: " + $('#char-attribute').val() + "\n";
       }
       if($('#char-skill').val()) {
         traitsStr += "Skill: " + $('#char-skill').val() + "\n";
@@ -659,7 +661,7 @@ function populateStoryPage(pageNum) {
   //We add the image parts before the flip because of some weird bug rendering an image after the page turns
   $(contentId).html('<center><b>' + storyLogic.title.trim() + '</b></center><br />' + 
                             storyHtmlText +
-                            '<div id="story-div-' + (idx+1) + '"><img ' + (storyLogic.chunks[idx].image != '' ? 'src="' + storyLogic.chunks[idx].image + '"' : 'src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif"') + 
+                            '<div id="story-div-' + (idx+1) + '"><img ' + (storyLogic.chunks[idx].image != '' ? 'src="' + storyLogic.chunks[idx].image + '"' : 'src="../assets/images/loadingimage.gif"') + 
                                                                       ' class="story-img"></img>' +
                             '<center><span>' + imageTitle + '</span></center></div>' +
                             '<button class="continue-button" id=' + (pageNum != '11.4' ? '"go-to-story-part-' + (idx+2) + '"' : '"go-to-after-fight-page"') + 
@@ -744,10 +746,10 @@ window.handlePostStoryXHR = async function(data,finishedFor,index) {
     storyLogic.chunks[2].text = data;
     //For some reason GPT's quotes aren't breaking into new paragraphs. Fixing that here.
 
-//Creative Writing Instructions: Based on the characters and story below, write several thrilling paragraphs on the epic showdown between ${storyLogic.char1} and ${storyLogic.char2}.
+//Creative Writing Instructions: Based on the characters and story below, complete the awesome showdown between ${storyLogic.char1} and ${storyLogic.char2}.
     makeGPT(
 `#Award Wining Fan Fiction
-Creative Writing Instructions: Based on the characters and story below, complete the showdown in which ${storyLogic.char1} defeats ${storyLogic.char2}.
+Creative Writing Instructions: Based on the characters and story below, complete the awesome showdown in which ${storyLogic.char1} defeats ${storyLogic.char2}.
 ---
 ${bothCharactersTopOfPrompt}
 
@@ -898,6 +900,11 @@ ${storyLogic.chunks[3].text}
       'New Rating ' + newRating + '<span id="rating-adjustment-points">' + ratingDifference + ' pts</span>');
     
     userObj.characters[storyLogic.currentCharacter].rating = newRating;
+
+    if(!userObj.justCompletedFirstBattle) {
+      //If this user is already setup we save immediately now that the battle is over and a winner is declared
+      saveUser();
+    }
   } 
   else if(finishedFor == 'imagePromptForCharacter') {
     incrementLoadingBar();
@@ -998,6 +1005,7 @@ async function writeStory(opponent, opponentDescription, isIntroStory,opponentRa
        
       if(!userObj.characters[storyLogic.currentCharacter].stories) {
         userObj.characters[storyLogic.currentCharacter].stories =  [];
+        store.spendCredits(1);
       }
 
       storyLogic.id =  Math.floor(Math.random() * 10000000000000);
@@ -1028,8 +1036,8 @@ async function writeStory(opponent, opponentDescription, isIntroStory,opponentRa
       
       if(isIntroStory) {
         switch(storyLogic.opponent) {
-          case 'Merlin': storyLogic.opponentDescription = "Merlin is a revered sage in King Arthur's court, known for his mastery of alchemy and divination. He is cloaked in regal robes of purple and gold, with a crown of emerald upon his head, which symbolizes his deep connection to the mystical forces of the universe. His voice is deep and resonant, and his words have the power to touch the soul of all who hear him. However, Merlin is consumed by a singular obsession: the acquisition of knowledge of a spell that he believes could transform mundane objects into cheese wheels. Yes, you read that right - cheese wheels. He spends his days poring over ancient tomes and experimenting with alchemical formulas, always seeking to unlock the secrets of this elusive spell. His quest for knowledge sometimes causes him to take risks that others might find foolish, but he is undeterred in his pursuit of this goal. Even as the realm faces growing threats from all sides, Merlin remains focused on his mission, convinced that the ability to transform anything into delicious cheese is a magic worth mastering.";
-                         storyLogic.opponentRating = 1600;
+          case 'Merlin': storyLogic.opponentDescription =  "Merlin: the wacky wizard at King Arthur's court, is known for his zany experiments in alchemy and divination. Dressed in mismatched purple and gold robes, he sports a kooky emerald hat that looks like it's been through a few too many magical mishaps. With a voice that can go from squeaky to boomy in an instant, his words never fail to make everyone around him giggle. This loopy magician has a quirky obsession: he's determined to learn the ultimate spell to turn everyday objects into cheese wheels! Yep, that's right - cheese wheels! He spends his days haphazardly flipping through dusty old books and mixing up wild concoctions, always on the hunt for the secret to this cheesy transformation. In his pursuit of cheese-related knowledge, Merlin has attempted some truly hairbrained schemes. There was the time he accidentally turned the Round Table into a giant wheel of cheddar, leaving the knights to chase after it as it rolled away. Or the incident where he filled the castle moat with bubbling fondue, causing the drawbridge to stick in the gooey mess. And who could forget when he zapped a flock of birds, turning them into flying cheese puffs that rained down cheesy crumbs all over the kingdom? Even as the kingdom faces challenges from every direction, Merlin's single-minded focus on mastering the art of cheese-making magic brings laughter and light-heartedness to all. So, watch out for this zany wizard, because you never know what cheesy surprise he might have up his billowy sleeves!";
+                storyLogic.opponentRating = 1600;
                 break;
           case 'Staria Stormrider': storyLogic.opponentDescription = "Staria Stormrider: a former elite soldier turned bounty hunter in a post-apocalyptic world, is driven by her ambition to obtain the legendary \"Worldbreaker\" weapon. This elusive artifact, believed to harness the energy of collapsing stars, has the potential to level entire cities or even alter the planet's climate. With her cropped red hair, icy blue eyes, and scars from numerous battles, Storm strikes fear into her opponents. Obsessed with the Worldbreaker's unimaginable power, she infiltrated and betrayed a group of freedom fighters who were fighting against Warlod Khan's rule, solely for the purpose of learning the weapon's whereabouts. Her ambition must be stopped."
                          storyLogic.opponentRating = 1500;
@@ -1217,7 +1225,7 @@ ${storyLogic.chunks[0].text}
 
 ${storyLogic.chunks[1].text}
 
-Step 1: Write a few clever lines of dialog between ${storyLogic.char1} and ${storyLogic.char2} (in the style of the two characters)`, undefined,.7,0.00,
+Step 1: Write a few lines of dialog between ${storyLogic.char1} and ${storyLogic.char2} (really emphasize the style of the two characters! The quotes should be much in the way tha they think and speak. Have fun!)`, undefined,.7,0.00,
 `
 Step 2. Describe the two character's attacks. Come up with something unexpected that elevates the tension.
 <Complete Step 2 Here>

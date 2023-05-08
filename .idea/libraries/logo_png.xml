@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="logo.png">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/platforms/android/app/build/intermediates/compressed_assets/debug/out/assets/www/img/logo.png.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

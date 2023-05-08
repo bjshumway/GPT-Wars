@@ -33,19 +33,33 @@ html {
 
 
 body {
- margin: 0; 
- padding: 0; 
- height: 98vh; 
- min-height: 98vh;
- overflow-x: hidden;
- overflow-y: hidden;
- width:600px;
- position:absolute;
- border-radius: 2%;
- box-shadow: -2vw 0vh 2vw 0vw black;
- top: 1%; 
- line-height:unset ;
+  margin: 0; 
+  padding: 0; 
+  height: 98vh; 
+  min-height: 98vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  width:600px;
+  position:absolute;
+  border-radius: 2%;
+  box-shadow: -2vw 0vh 2vw 0vw black;
+  top: 1%; 
+  line-height:unset ;
+ }
+
+
+@media screen and (max-width:600px)  { 
+  /* smartphones, Android phones, landscape iPhone */
+  body {
+    height:100vh;
+    min-height: 100vh;
+    width:100%;
+    border-radius:0;
+    box-shadow:unset;
+    top:0;
+  }
 }
+
 
 a {
   color: revert;
@@ -209,6 +223,35 @@ body::-webkit-scrollbar{
   display:none;
 }
 
+
+#thank-you-for-your-interest {
+  z-index: 999999;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  background-color: darkslategray;
+  padding: 2%;
+  border-radius: 5%;
+  box-shadow: .25vw .25vw .25vw .25vw black;
+  color: antiquewhite;
+}
+
+#store-popup {
+  z-index: 999999;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  background-color: darkslategray;
+  padding: 2%;
+  border-radius: 5%;
+  box-shadow: .25vw .25vw .25vw .25vw black;
+  color: antiquewhite;
+  display: none;
+}
+
+
 #choose-your-character {
   z-index: 999999;
   position: absolute;
@@ -222,6 +265,9 @@ body::-webkit-scrollbar{
   color: antiquewhite;
   display:none;
 }
+
+
+
 
 #show-reason-outcome {
   z-index: 999999;
@@ -401,7 +447,7 @@ body::-webkit-scrollbar{
 #char-write-name{
   position: absolute;
   top: 18%;
-  background-size: 16px 18px;
+  background-size: 10vw 10vh;
   cursor: auto;
   color: white;
   width: 80%;
@@ -429,6 +475,16 @@ body::-webkit-scrollbar{
 #p0-content {
   top: 0 !important;
   border-radius: 0 !important;
+}
+
+#discord-top {
+  position: absolute;
+  right: 20%;
+  cursor: hover;
+  cursor: pointer;
+  box-shadow: 0.2vw 0.2vh 0.2vh 0.2vh black;
+  top: 1vh;  
+  background-color:rgba(20, 20, 100, .5)
 }
 
 #login {
@@ -484,6 +540,34 @@ body::-webkit-scrollbar{
 
 #characters {
   top:77vh;
+}
+
+#store {
+  top: 88vh;
+}
+
+.coin {
+  size: 10vw;
+  text-align: center;
+  width: 10vw;
+  color: darkgoldenrod;
+
+}
+
+#front-page-coin {
+  right: 8vw;
+  top: 86vh;
+  position: absolute;
+}
+
+.coin-img {
+  width: 10vw;
+}
+
+#front-page-coin-img {
+  position: absolute;    
+  right: 8vw;
+  top: 86vh;
 }
 
 /*Hiding this for now... as its not used!*/
@@ -632,7 +716,7 @@ body::-webkit-scrollbar{
 .front {
   z-index: 1;
   backface-visibility: hidden;
-  border-left: 3px solid powderblue;
+  border-left: 1vw solid powderblue;
 }
 
 .back {
@@ -746,18 +830,14 @@ body::-webkit-scrollbar{
   padding-block-end: calc(var(--a-field-input-padding-y, 0.25rem) - var(--a-field-input-border-width, 1px));
   padding-inline-start: var(--ut-field-input-padding-x-offset, calc(var(--a-field-input-padding-x, 0.25rem) - var(--a-field-input-border-width, 1px)));
   transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
-  padding: 1px 2px;
+  padding: 1px 1px;
   height: 6vh;
-  font-height: 6vh;
   font-size: 4vh;
   text-align: center;
   width: 100%;
   height: 6vh;
-  font-height: 6vh;
   font-size: 4vh;
   text-align: center;
-  /*todo playful font - press start doesnt fit*/
-  /* position: absolute; */
   left: 2,5%;
   width: 100%;
   color: white;
@@ -785,11 +865,17 @@ body::-webkit-scrollbar{
   text-align: center;
 }
 
+#char-gender,#char-skill,#char-resource {
+  max-width: -webkit-fill-available;
+  background-color: rgba(0,0,0,.8);
+  color: whitesmoke;
+}
+
 .continue-button {
   cursor: pointer;
   line-height: 2.75vh;
   font-size: 1.2rem;
-  border-radius: 5px;
+  border-radius: 1vh;
   width: 100%;
   left: 5%;
   height: 5vh;
@@ -871,7 +957,7 @@ body::-webkit-scrollbar{
   background-color:#333 !important;
 }
 .w3-button {
-  border-bottom: 4px solid palegoldenrod;
+  border-bottom: 1vh solid palegoldenrod;
   border-top: 1px solid palegoldenrod;
   background-color:#444 !important;
 }
@@ -1080,17 +1166,6 @@ body::-webkit-scrollbar{
   font-size:2vh;  
 }
 
-
-#page-wrap {
-  width: 490px;
-  margin: 80px auto;
-}
-
-h1 {
-  font-size: 42px;
-  font-weight: 600;
-  margin: 0 0 30px;
-}
 
 #rating-adjustment-points {
   font-size: 2vh;

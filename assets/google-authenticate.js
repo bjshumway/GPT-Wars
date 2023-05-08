@@ -60,6 +60,9 @@ async function handleCredentialResponse(response) {
     $('#login-div').hide();
     $('#start-button').hide();
     $('#battle').show();
+    $('#store').show();
+    $('#front-page-coin').show();
+    $('#front-page-coin-img').show();
     $('#characters').show();
     $('#settings').show();
     $('#login').hide();

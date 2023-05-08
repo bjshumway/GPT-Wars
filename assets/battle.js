@@ -69,7 +69,9 @@ function populateChooseYourCharacter() {
     getOpponents('random');    
 
     $('#choose-your-character').hide();
-    $('#back-page-btn').show();
+    if(!isMobile) {
+      $('#back-page-btn').show();
+    }
     goSpecificPage(9);
   });
 
