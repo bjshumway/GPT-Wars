@@ -251,6 +251,20 @@ body::-webkit-scrollbar{
   display: none;
 }
 
+#coin-description {
+  z-index: 999999;
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  width: 35%;
+  background-color: darkslategray;
+  padding: 2%;
+  border-radius: 5%;
+  box-shadow: .25vw .25vw .25vw .25vw black;
+  color: antiquewhite;
+  display: none;
+}
+
 
 #choose-your-character {
   z-index: 999999;
@@ -547,27 +561,27 @@ body::-webkit-scrollbar{
 }
 
 .coin {
-  size: 10vw;
+  size: 20%;
   text-align: center;
-  width: 10vw;
+  width: 20%;
   color: darkgoldenrod;
-
+  cursor: pointer;
 }
 
 #front-page-coin {
-  right: 8vw;
-  top: 86vh;
+  right: 8%;
+  top: 86%;
   position: absolute;
 }
 
 .coin-img {
-  width: 10vw;
+  width: 20%;
 }
 
 #front-page-coin-img {
   position: absolute;    
-  right: 8vw;
-  top: 86vh;
+  right: 8%;
+  top: 86%;
 }
 
 /*Hiding this for now... as its not used!*/

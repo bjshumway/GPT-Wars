@@ -5,8 +5,15 @@ window.addEventListener('load',function() {
 
   $('#store').on('click', function() {
     appLocation = 'Store';
-    //Reset battle
+    $('#store-popup').show();
 
+    
+    //Return false so this doesn't get hidden by page 0's handler
+    return false;
+  })
+
+  $('#coin').on('click', function() {
+    $('#coin-description').show();
     //Return false so this doesn't get hidden by page 0's handler
     return false;
   })

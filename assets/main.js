@@ -59,6 +59,24 @@ var currentLoadImage = 0;
 var isMobile = false;
 
 
+/*Handle session timeout. No action for 1 hour = kill session and refresh page*/
+var idleInterval;
+var idleTime = 0;
+function resetTimeout() {
+  idleTime = 0;
+}
+
+function timerIncrement() {
+  idleTime = idleTime + 1;
+  if (idleTime > 59) { // 60 minutes
+      window.clearInterval(idleInterval);
+      alert("Session timeout. Reloading app.");
+      sessionStorage.removeItem("userId")
+      window.location.reload();
+  }
+}
+
+
 async function loadAudio(audioName,url, playImmediately) {
   var request = new XMLHttpRequest();
   request.open('GET', url, true);
@@ -182,6 +200,20 @@ window.addEventListener('load', function() {
     isMobile = true;
   }
 
+  // Increment the idle time counter every minute.
+  idleInterval = setInterval(timerIncrement, 60000); // 1 minute 60000
+
+  // Zero the idle timer on mouse movement.
+  $("input").on("keypress", resetTimeout);
+  $("html,div,button").on("click", resetTimeout);
+  $("html").on("scroll", resetTimeout);    
+
+  document.addEventListener("mousemove", resetTimeout, false);
+  document.addEventListener("mousedown", resetTimeout, false);
+  document.addEventListener("keypress", resetTimeout, false);
+  document.addEventListener("touchmove", resetTimeout, false);
+  document.addEventListener("onscroll", resetTimeout, false);      
+
   const urlSearchParams = new URLSearchParams(window.location.search);
   const params = Object.fromEntries(urlSearchParams.entries());
 
@@ -246,6 +278,8 @@ window.addEventListener('load', function() {
 
     $('#show-reason-outcome').hide();
     $('#choose-your-character').hide();
+    $('#not-enough-credits').hide();
+    $('#store-popup').hide();    
     $('#replace-existing-powerup').hide();
 
     //Hide the "Welcome" popup
@@ -306,7 +340,9 @@ window.addEventListener('load', function() {
   $('#p0-content').on('click', function() {
     $('#login-div').hide();
     $('#apply-settings').hide();
-    $('#choose-your-character').hide();    
+    $('#choose-your-character').hide();  
+    $('#not-enough-credits').hide();
+    $('#store-popup').hide();
     if(!sessionStorage["userId"]) {
 
       //Don't show it if we are in the middle of loading the user...
@@ -331,7 +367,8 @@ window.addEventListener('load', function() {
         $('#front-page-coin').show();
         $('#front-page-coin-img').show();    
         $('#characters').show();
-        $('#settings').show();    
+        $('#settings').show();
+        $('#coin').text(userObj.creditsRemaining);
       } else {
         $('#start-button').show();
         $('#battle').hide();
@@ -447,6 +484,7 @@ window.addEventListener('load', function() {
 
 
 function handleClicks(e) {
+  idleTime = 0;
   playAudio("clicksound");
   var id = $(this).prop('id');
 

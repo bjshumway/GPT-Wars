@@ -1,0 +1,467 @@
+<html>
+<head>
+
+<<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!--<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width" > -->
+
+
+<!-- Add this androidjs.js file to your html file to get the functionality of android js -->
+<!-- COMMENTED OUT UNTIL WE NEED IT
+<script type="text/javascript" src = "js/androidjs.js?v=1"></script>
+-->
+
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css?v=1">
+</link>
+<link rel="stylesheet" href="css/main.css?v=1">
+</link>
+<script src="js/architypes.js?v=1"></script>
+<script src="js/user-obj.js?v=1"></script>
+<script src="js/gpt-api.js?v=1"></script>
+<script src="js/stablediffusion-api.js?v=1"></script>
+<script src="js/main.js?v=1"></script>
+<script src="js/google-authenticate.js?v=1"></script>
+<script src="js/character-book.js?v=1"></script>
+<script src="js/battle.js?v=1"></script>
+<script src="js/elevenlabs.js?v=1"></script>
+<script src="js/imageUpload.js?v=1"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+
+<!--Disabled for now-->
+<!--<script src="js/playht-api.js?v=1"></script>
+<script src="js/evoke-api.js?v=1"></script>
+-->
+
+
+<link rel="icon" href="img/images/Martz90-Circle-Books.ico?v=2" />
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js?v=1"></script>
+
+<script>
+  var delay = (time) => new Promise((resolve, reject) => setTimeout(resolve, time))
+
+  async function loadMod() {
+    window.mod = await import("https://deno.land/x/gpt_2_3_tokenizer@v0.0.1/mod.js?v=1");
+    //console.log("encoding hw", mod.encode("hello world"))    
+  }
+  loadMod();
+
+</script>
+
+</head>
+<body>
+
+<!-- This is the background div for the logo that appears before the game starts "AI Forge"-->
+<div id="splash-backscreen"></div>
+<!-- This is the logo that appears on the splash screen-->
+<div id="splash-logo"></div>
+
+
+<!-- This is the "go-back" button that appears when you're paginating in the book-->
+<button id="back-page-btn"></button>
+
+
+<!-- Login -->
+<div id="login-div">
+  <p class="input-field">Username</p>
+    <input type="text" id="login-username">
+  <p class="input-field" >Password</p>
+    <input type="password" id="login-password">
+    <p style="text-align: center;">
+      <button id="login-button">Login</button>
+    </p>  
+    <p style="text-align: center;">
+    <a href="#" class="link">Forgot Password</a>
+  </p>
+  <p style="text-align: center;">
+    <a href="http://www.aiforge.io/subscribe" class="link">Register</a>
+  </p>
+  <div id="google-container">
+    <div id="buttonDiv" style="display: inline-block;"></div>
+  </div> 
+</div>
+
+<!-- Create Account -->
+<div id="create-account">
+  <p><center>Welcome to GPT-Wars!</center></p>
+  <p><center>Create an account to get started</center></p>
+
+  <!--
+
+  <p class="input-field">Username</p>
+    <input type="text" id="register-username">
+  <p class="input-field">Password</p>
+    <input type="password" id="register-password-1">
+  <p class="input-field">Re-type Password</p>
+    <input type="password" id="register-password-2">
+    <p style="text-align: center;">
+      <button id="register-button">Register</button>
+    </p>
+-->
+    <div class="google-container">
+<!--    - Or register via google - -->
+    <br />
+    
+    <div id="buttonDiv2" style="display: inline-block;"></div>
+  </div> 
+</div>
+
+<!-- Login -->
+<div id="thank-you-for-your-interest">
+  Thank you for your Interest in GPT Wars!
+  <br /><br />
+  We are currently in Beta looking for
+  <ul>
+    <li>Testers</li>
+    <li>Developers</li>
+    <li>Investors</li>
+  </ul>
+  <br />
+  Find us on Discord <a href="https://discord.gg/WFgMWQakDz"><img src="img/images/icons8-discord-48.png"></img></a>
+</div>
+
+
+<!-- Choose your character -->
+<div id="choose-your-character"></div>
+
+<!-- Store Popup -->
+<div id="store-popup">
+  Each battle costs 1 gold.
+  <button>I want more gold! Click here to purchase. $5 for 100 gold.</button>
+  <button>Modify my subscription plan</button>
+</div>
+
+<!--This is the settings div (currently not used)-->
+<div id="apply-settings">
+   <div><input id="voice-audio-on-off" type="checkbox"></input> Voice Audio (not yet implemented)</div>
+   <div><input id="reading-speed" type="checkbox"></input> Reading Speed (not yet implemented)</div>
+</div>
+
+
+<!-- This is the pop-up div that shows the reason why you won or lost a battle -->
+<div id="show-reason-outcome"></div>
+
+<!-- This div appears when you have more than 3 powerups. It asks you which powerup you want to replace-->
+<div id="replace-existing-powerup"></div>
+
+<!-- This is the div for the "Loading" popup that occurs-->
+<div class="loading-container">
+  <div class="spinner">
+    <div class="spinner-item"></div>
+    <div class="spinner-item"></div>
+    <div class="spinner-item"></div>
+    <div class="spinner-item"></div>
+    <div class="spinner-item"></div>
+  </div>
+  <div class="loading-spinner-text" style="color: navajowhite;width: 100%;text-align: center;padding-bottom: 2vh;">
+    Loading
+  </div>
+</div>
+
+<!-- This is the character book that we use to look at characters we've built. Currently supports up to 9 characters-->
+<div id="char-book">
+  <div id="char-read-view">
+    <div class="char-nav-buttons"">
+      <span class="char-slot">Slot 1/9</span>
+      <span class="prev-char">&lt;</span>
+      <span class="next-char">&gt;</span>
+    </div> 
+    <p id="char-read-name">Mr. Doodle</p>
+    <img id="char-prof-pic" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png">
+    <p id="char-read-arch">Super Cool Badass Guy</p>
+    <p id="char-stats">Lv 2, Exp 0 - Power Rating 1250</p>
+    <p id="char-read-desc">Long Description Here. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . </p>
+    <!--<button href="#" id="view-previous-stories" onclick="alert('Not Yet Implemented')">View Stories</button>-->
+    <button href="#" style="display: relative;" id="delete-character">Delete Character</button>
+  </div> 
+    <div id="character-create-new" class="signpost">
+      Create New Character!
+    </div>
+  </div>
+
+
+
+
+
+<!-- This is the "main book" for character creation, picking opponenet, loading, story, picking a powerup, etc.-->
+<div id="book" class="book">
+  <div id="p0" class="paper flipped" style="z-index: 0;">
+    <div class="back">
+      <div id='p0-content' class="text-screen back-content"">
+          <a id="discord-top" href="https://discord.gg/WFgMWQakDz"><img src="img/images/icons8-discord-48.png"></img></a>
+          <button id="login">Login</button>        
+          <button id="logout">Logout</button>        
+          <p id="title">
+          GPT Wars
+        </p>
+        <div id="battle" class="signpost">
+          Battle!
+        </div>
+        <div id="characters" class="signpost">
+          Characters
+        </div>
+        <img src="depositphotos_12763803-stock-illustration-blank-gold-coin.png" class="coind-img" id="front-page-coin-img">
+        <span class="coin" id="front-page-coin">25</span>        
+        <div id="store" class="signpost">Store</div>        
+        <div id="settings" class="signpost">
+          Settings
+        </div>
+
+        <button id="start-button">Start Your Journey</button>
+      </div>
+    </div>
+  </div>
+  <div id="p1" class="paper" style="z-index: 9;">
+    <div class="back">
+      <div id='p1-content' class="text-screen back-content"">
+        &nbsp;&nbsp;&nbsp;Deep in the cosmos of space a tournament is brewing. 
+        Heroes and villains from all genres (fantasy, sci-fi, anime, action, comedy) travel from 
+        the far reaches to prove their might!
+        <img src="img/images/cosmic-arena.png" style="width:100%;margin-top:2vh;"></img>
+        <button id="go-to-intro2" class="continue-button" style="margin-top:2vh;" snd="pageturn" style="margin-top: 10vh;">Continue!</button>        
+      </div>
+    </div>
+  </div>
+  <div id="p2" class="paper" style="z-index: 8;">
+    <div class="back">
+      <div id='p2-content' class="text-screen back-content"">
+        &nbsp;&nbsp;&nbsp;Hello! I am "The Story Teller" - an AI powered voice, writer, and illustrator built from cutting-edge tech. <br />&nbsp&nbsp&nbspIn 'AI Story Battles' you create a custom character, which I then write into thrilling tales of heroism, tragedy and valor.<br />&nbsp&nbsp&nbspHow you write your character matters. If your character is a wizard, it will use magic. If it's a detective, it will employ its powers of deduction.&nbsp&nbsp&nbspThe stronger your character's depiction, the greater chances of success.<br />&nbsp&nbsp&nbspGet ready for some epic wacky fights!
+        <br />
+        <button class="continue-button" id="go-to-intro-tournament"snd="pageturn">Continue!</button>        
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <div id="p3" class="paper" style="z-index: 7;">
+    <div class="back">
+      <div id='p3-content' class="text-screen back-content"">
+        &nbsp;&nbsp;&nbsp;You may enter The Grand Tournament to go head-to-head against characters crafted by your friends or other players.  May the most epic character win!
+        <img src="img/images/tournament.jpg" id="playoffs-img"></img>
+        <button id="go-to-intro-ladder" class="continue-button" snd="pageturn" style="margin-top: 10vh;">Continue!</button>        
+      </div>
+    </div>
+  </div>
+
+
+
+  <div id="p4" class="paper" style="z-index: 6;">
+    <div class="back">
+      <div id='p4-content' class="text-screen back-content"">
+        &nbsp;&nbsp;&nbsp;Or, test your character's strength against harder and harder combatants! Rewrite your character as needed to graduate to the next power level.
+        <div style="text-align:center"><img src="img/images/test-strength.jpg" id="high-striker-img"></img></div>
+        <button id="go-to-architype-intro" class="continue-button" snd="pageturn" style="margin-top: 2vh;">Continue!</button>
+      </div>
+    </div>
+  </div>
+  --!>
+
+  <div id="p5" class="paper" style="z-index: 5;">
+    <div class="back">
+      <div id='p5-content' class="text-screen back-content"">
+        <span id="teach-architype">&nbsp;&nbsp;&nbsp;First thing's first, character creation! We'll begin with the archetype. This can be vague, such as "Hero" or "Vigilante", less vague such as "Ice Dragon" or "Space Marine",
+        or something specific like "Time-Traveling Detective with a Pet T-Rex." - Whatever strikes your fancy! Don't worry, you can adjust your character at any time.</span>
+        <textarea id="description-architype"     class="classic-input two-lines"></textarea>
+        <button class="continue-button" snd="pageturn" id="suggest-architype" style="margin-top: 2vh;"><span class="dice">🎲</span>Random Suggestion</button>
+        <button class="continue-button" snd="pageturn" style="margin-top: 2vh;" disabled id="comment-on-architype">Continue!</button>        
+      </div>
+    </div>
+  </div>
+  <div id="p5-1" class="paper" style="z-index: 4;">
+    <div class="back">
+      <div id='p5-1-content' class="text-screen back-content"">
+        <p id="quick-architype-comment"><br /><br />Loading response (can take up to a minute)</p>
+        <button class="continue-button" snd="pageturn" id="try-another-architype" style="margin-top: 8vh;">Try Something Else</button>
+        <button class="continue-button" snd="pageturn" id="go-to-name-creation" style="margin-top: 2vh;">Cool, Continue!</button>        
+      </div>
+    </div>
+  </div>
+  <div id="p6" class="paper" style="z-index: 4;">
+    <div class="back">
+      <div id='p6-content' class="text-screen back-content"">
+        <br /><br /><br />Now, give your character a name
+        <br />
+        <input id="char-name"     class="classic-input" type="text">
+        <br />
+          <span>Gender: 
+            <select id="char-gender">
+              <option value="">leave blank</option>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+              <option value="Other">Non-Binary</option>
+              <option value="Other">N/A</option>
+            </select></span><br />
+          <span>Skill:     <select id="char-skill" class="char-desc-choice"></select></span><br />
+          <span>Resource:  <select id="char-resource" class="char-desc-choice"></select></span><br />
+        <button class="continue-button" snd="pageturn" id="suggest-name" style="margin-top: 2vh;"><span class="dice">&#127922;</span>Suggest Name</button>
+        <button class="continue-button" snd="pageturn" id="generate-description" style="margin-top: 10vh;" disabled>Continue!</button>        
+      </div>
+    </div>
+  </div>  
+  <div id="p7" class="paper" style="z-index: 3;">
+    <div class="back">
+      <div id='p7-content' class="text-screen back-content">
+        <p id="char-name2"></p>
+        <p id="describe-help">&nbsp;&nbsp;&nbsp;Now is the most important part, your character's description - This affects everything regarding the stories I generate!</p>
+        <p>&nbsp;&nbsp;&nbsp;My role as the story teller is not to arbitrarily pick a winner, but to tell the most epic story.</p>
+        <p>&nbsp;&nbsp;&nbsp;This means that the more epic, interesting, powerful your character description, the more likely his success in battle.</p>
+        <p>&nbsp;&nbsp;&nbsp;To start I will generate a description for you (using the name and architype), but you may rewrite it to your heart's content. </p>
+        <button class="continue-button" id="continue-to-writing-the-description" snd="pageturn">Continue!</button>
+      </div>
+    </div>
+  </div>
+  <div id="p8" class="paper" style="z-index: 2;">
+    <div class="back">
+      <div  id="p8-content" class="text-screen back-content">
+        <p id="char-name3"></p>
+        <textarea id="describe-text-area" class="describe-text-area"></textarea>
+        <button class="continue-button" snd="pageturn" id="go-to-description-comment">Continue!</button>
+      </div>
+    </div>
+  </div>
+  <!--
+  <div id="p8-1" class="paper" style="z-index: 4;">
+    <div class="back">
+      <div id='p8-1-content' class="text-screen back-content">
+      <p>Okay, we'll start your character off with a power level of 5. Each time he wins a battle, the power level goes up. - loses, goes down.</p><br />
+      <p>Now for the last part of your training. It's time for your first battle! Click "continue" - to choose an opponent.</p>
+      <button class="continue-button" snd="pageturn" id="go-to-pick-first-opponent" style="margin-top: 2vh;">Continue!</button>        
+      </div>
+    </div>
+  </div>
+  --!>
+  <div id="p9" class="paper" style="z-index: 1;">
+    <div class="back">
+      <div id="p9-content" class="text-screen back-content">
+        <p>
+        <p class="call-to-action-description">Choose your opponent!</p>
+        <div class="w3-container">
+          <div onclick="openAccordian('opponent-choose-1')" class="w3-button w3-block w3-black ">
+            <span class="accordian-title">Merlin</span>
+            <img src="img/images/merlin1.png" style="width:100%;display:block;">
+          </div>
+          <div id="opponent-choose-1" class="w3-hide w3-animate-zoom w3-inside">
+            <div class="opponent-description">Merlin is a revered sage in King Arthur's court, known for his mastery of alchemy and divination. He is cloaked in regal robes of purple and gold, with a crown of emerald upon his head, which symbolizes his deep connection to the mystical forces of the universe. His voice is deep and resonant, and his words have the power to touch the soul of all who hear him. However, Merlin is consumed by a singular obsession: the acquisition of knowledge of a spell that he believes could transform mundane objects into cheese wheels. Yes, you read that right - cheese wheels. He spends his days poring over ancient tomes and experimenting with alchemical formulas, always seeking to unlock the secrets of this elusive spell. His quest for knowledge sometimes causes him to take risks that others might find foolish, but he is undeterred in his pursuit of this goal. Even as the realm faces growing threats from all sides, Merlin remains focused on his mission, convinced that the ability to transform anything into delicious cheese is a magic worth mastering.</div>
+            <button class="continue-button load-first-story" data-character-name="Merlin" snd="click">Choose!</button><br /><br />
+          </div>
+          <br />
+          <div onclick="openAccordian('opponent-choose-2')" class="w3-button w3-block w3-black" style="text-align-last:center;">
+            <span class="accordian-title">Staria Stormrider</span>    
+            <img src="img/images/staria_stormrider.png" style="width:100%;display:block;">
+          </div>
+          <div id="opponent-choose-2" class="w3-hide w3-animate-zoom w3-inside">
+            <div class="opponent-description">Staria Stormrider: a former elite soldier turned bounty hunter in a post-apocalyptic world, is driven by her ambition to obtain the legendary \"Worldbreaker\" weapon. This elusive artifact, believed to harness the energy of collapsing stars, has the potential to level entire cities or even alter the planet's climate. With her cropped red hair, icy blue eyes, and scars from numerous battles, Storm strikes fear into her opponents. Obsessed with the Worldbreaker's unimaginable power, she infiltrated and betrayed a group of freedom fighters who were fighting against Warlod Khan's rule, solely for the purpose of learning the weapon's whereabouts. Her ambition must be stopped.</div>
+            <button class="continue-button load-first-story" data-character-name="Staria Stormrider" snd="click">Choose!</button><br /><br />
+          </div>
+          <br />
+          <div onclick="openAccordian('opponent-choose-3')" class="w3-button w3-block w3-black " style="text-align-last:center;">
+            <span class="accordian-title">Agent Steele</span>    
+            <img src="img/images/agent_steele.png" style="width:100%;display:block;">
+          </div>
+          <div id="opponent-choose-3" class="w3-hide w3-animate-zoom w3-inside">
+            <div class="opponent-description">Agent Steele: A cunning and tormented detective in his late twenties, expertly balances on the razor's edge between law enforcement and the criminal underworld. Born into the powerful syndicate \"Tantalus\" and trained by his ruthless father, the notorious ringleader, Steele has been molded into a master manipulator, skilled in deception and sabotage. Tall and muscular, with piercing blue eyes and sharp features, Steele's outward appearance mirrors his sinister nature. As the organization's mole, he relentlessly protects Tantalus' interests by undermining investigations and masking their illicit activities.</div>
+            <button class="continue-button load-first-story" data-character-name="Agent Steele" snd="click">Choose!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<div id="p10" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p10-content" class="text-screen back-content">
+        
+        <div id="loading-page" style="" class="come-from-right">
+          <div style="
+            position: fixed;
+            top: 4%;
+            width: 95%;
+            left: 2.5%;
+            text-align: center;
+          "><span style="
+            color: white;
+            font-size: 3vh;
+          ">Generating story/images... </span>
+          </div>
+        <div class="meter">
+          <span></span>
+        </div>
+        </div>
+        <span id = "remaining-time">This usually takes 60 seconds</span>        
+        <!-- source: https://codepen.io/chriscoyier/pen/eYBOvJB?editors=0110 --!>
+        </div>
+    </div>
+  </div>
+  <div id="p11-1" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p11-1-content" class="text-screen back-content">
+      </div>
+    </div>
+  </div>
+  <div id="p11-2" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p11-2-content" class="text-screen back-content">
+      </div>
+    </div>
+  </div>
+  <div id="p11-3" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p11-3-content" class="text-screen back-content">
+      </div>
+    </div>
+  </div>
+  <div id="p11-4" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p11-4-content" class="text-screen back-content">
+      </div>
+    </div>
+  </div>
+  <div id="p12" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p12-content" class="text-screen back-content">
+        <center><p id="battle-finished-top"><b>Congratulations!</b><br>You have survived your first battle
+          <b>Your character was defeated</b></p>
+          <a href="#" id="link-to-show-reason-outcome">Why?</a>
+          <p id="show-new-rating">New Rating 1188 <span id="rating-adjustment-points">-12 pts</span></p>
+          <b>Choose a Powerup</b>
+          <div class="w3-container">
+            <div onclick="openAccordian('powerup-1')" class="w3-button w3-block w3-black ">
+              <span class="accordian-title">Super Sonic Speed</span>
+            </div>
+            <div id="powerup-1" class="w3-hide w3-animate-zoom w3-inside">
+              <div class="powerup-description">
+                As a result you gained x,y,z etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc. 
+              </div>
+              <button class="continue-button" id="powerup-choose-1">Choose!</button><br /><br />
+            </div>
+            <br />
+            <div onclick="openAccordian('powerup-2')" class="w3-button w3-block w3-black " style="text-align-last:center;">
+              <span class="accordian-title">Farmer Joe</span>    
+            </div>
+            <div id="powerup-2" class="w3-hide w3-animate-zoom w3-inside">
+              <div class="powerup-description">
+                As a result you gained x,y,z etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc.  etc. 
+              </div>
+              <button class="continue-button" id="powerup-choose-2">Choose!</button><br /><br />
+            </div>
+          </div>
+          <button class="continue-button" id="powerup-choose-none">Skip Powerup</button>
+        </center>
+      </div>
+    </div>
+  </div>
+
+  <div id="p13" class="paper" style="z-index: 10;">
+    <div class="back">
+      <div id="p13-content" class="text-screen back-content">
+        '<center><b>You're on your way</b><br /><br />More characters and powerups to come!<br /><br />But first create an account:<br /><br />'
+        <button class="continue-button" id="first-battle-login">Create Account<br />&amp; Save Progress!</button>
+      </div>
+    </div>
+  </div>  
+</div>
+
+</body>
+</head>

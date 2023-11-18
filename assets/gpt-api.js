@@ -1143,6 +1143,10 @@ Between the two characters described above, which would win if they went up agai
                                 '\n---\n';
 
       storyLogic.backStory = (await makeGPT(
+        /*'Creative Writing Prompt: Based on the character descriptions below, come up with a awesome/thematic incident that pit ' + storyLogic.char1 +' versus ' + storyLogic.char2 + ' against each other in a showdown \n\n' +
+        bothCharactersTopOfPromptWithoutPowers +
+        'Creative Writing Prompt: Based on the character descriptions above, come up with a awesome/thematic incident that pit ' + storyLogic.char1 +' versus ' + storyLogic.char2 + ' against each other in a showdown (Only one paragraph in length)',*/
+        
         'Creative Writing Prompt: Based on the character descriptions below, come up with a riveting/thematic backstory for the upcoming showdown between ' + storyLogic.char1 +' versus ' + storyLogic.char2 + '\n\n' +
         bothCharactersTopOfPromptWithoutPowers +
         'Creative Writing Prompt: Based on the character descriptions above, come up with a riveting/thematic backstory for the upcoming showdown between ' + storyLogic.char1 +' versus ' + storyLogic.char2 +' (explaining why the two characters are add odds with each other) (Only one paragraph in length)',

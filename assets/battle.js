@@ -75,7 +75,12 @@ function populateChooseYourCharacter() {
     goSpecificPage(9);
   });
 
-  $('#choose-your-character').show();
+  if(userObj.creditsRemaining > 0) {
+    $('#not-enough-credits').show();
+  } else {
+    $('#choose-your-character').show();
+  }
+
 
 }
 
